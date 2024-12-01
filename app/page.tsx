@@ -39,12 +39,12 @@ export default function Home() {
 
     const parsed = await formValuesSchema.parseAsync(formValues);
 
-    const graphQLClient = new GraphQLClient(`/api/graphql`);
+    const graphQLClient = new GraphQLClient(`https://severity-ai-xi.vercel.app/api/graphql`);
     await graphQLClient.request(preorderMutation, parsed);
   }
 
   async function getPreorderCount() {
-    const data = await request<QueryData>(`/api/graphql`, countQuery);
+    const data = await request<QueryData>(`https://severity-ai-xi.vercel.app/api/graphql`, countQuery);
     return data.getPreorderCount;
   }
 
