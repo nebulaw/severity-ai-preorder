@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { GraphQLClient, gql, request } from "graphql-request";
 import { z } from "zod";
-import "./env-config";
+
 const countQuery = gql`
   query getPreorderCount {
     getPreorderCount
@@ -27,30 +27,24 @@ const formValuesSchema = z.object({
 })
 
 
-const host = process.env.NEXT_PUBLIC_HOST_URL;
-
 export default function Home() {
   const [preorderCount, setPreorderCount] = useState<number>(0);
 
   async function addPreorder(formData: FormData) {
-
-    console.log("Adding preorder to ", host);
     const formValues = {} as Record<string, string | object>;
     for (const [key, value] of [...formData.entries()]) {
       if (key.includes("ACTION_ID")) continue;
       formValues[key] = value.valueOf();
     }
 
-    // Validate the parsed form data
     const parsed = await formValuesSchema.parseAsync(formValues);
 
-    // Create a GraphQL client and execute the mutation
-    const graphQLClient = new GraphQLClient(`${host}/api/graphql`);
+    const graphQLClient = new GraphQLClient(`/api/graphql`);
     await graphQLClient.request(preorderMutation, parsed);
   }
 
   async function getPreorderCount() {
-    const data = await request<QueryData>(`${host}/api/graphql`, countQuery);
+    const data = await request<QueryData>(`/api/graphql`, countQuery);
     return data.getPreorderCount;
   }
 
@@ -81,8 +75,8 @@ export default function Home() {
         <div className="text-4xl sm:text-6xl font-bold text-gray-300 max-w-[800px] text-center px-4 sm:px-8 sm:leading-snug">
           დაიცავი შენი ბიზნესი კიბერ შეტევებისგან
         </div>
-        <div className="font-extralight text-gray-400 max-w-[700px] text-center text-sm sm:text-base mb-8 sm:mb-16 px-4">
-          ჩვენ უახლესი ხელოვნური ინტელექტის გამოყენებით ვადგენთ და ვასწორებთ უსაფრთხოების დარღვევებს რათა დავიცვათ თქვენი აპლიკაცია. {/*ხარვეზების დროული პრევენცია თქვენს კარგ რეპუტაციას, დაზოგილ ხარჯებსა და ნდობას ნიშნავს.*/}
+        <div className="font-extralight text-gray-400 max-w-[800px] text-center text-sm sm:text-base mb-8 sm:mb-16 px-4">
+          ყველასათვის ხელმისაწვდომი, ხელოვნურ ინტელექტზე დაფუძნებული კოდის ანალიზის ხელსაწყო.
         </div>
         <div>
           {preorderCount > 0 && (
@@ -90,7 +84,7 @@ export default function Home() {
               <span className="">{preorderCount}</span> ადამიანი ელოდება ჩვენს პროდუქტს
             </div>
           )}
-          <form action={addPreorder} className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md mx-auto"> {/* Added max-w-md and mx-auto */}
+          <form action={addPreorder} className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md mx-auto">
             <input
               type="email"
               name="email"
