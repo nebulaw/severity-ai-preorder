@@ -1,34 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { GraphQLClient, gql, request } from "graphql-request";
-import { z } from "zod";
+//import { GraphQLClient, gql, request } from "graphql-request";
+// import { z } from "zod";
 
-const countQuery = gql`
-  query getPreorderCount {
-    getPreorderCount
-  }
-`;
-
-const preorderMutation = gql`
-  mutation addPreorder($email: String!) {
-    addPreorder(email: $email) {
-      id
-    }
-  }
-`;
-
-interface QueryData {
-  getPreorderCount: number;
-}
-
-const formValuesSchema = z.object({
-  email: z.string().email(),
-})
+// const countQuery = gql`
+//   query getPreorderCount {
+//     getPreorderCount
+//   }
+// `;
+//
+// const preorderMutation = gql`
+//   mutation addPreorder($email: String!) {
+//     addPreorder(email: $email) {
+//       id
+//     }
+//   }
+// `;
+//
+// interface QueryData {
+//   getPreorderCount: number;
+// }
+//
+// const formValuesSchema = z.object({
+//   email: z.string().email(),
+// })
 
 
 export default function Home() {
-  const [preorderCount, setPreorderCount] = useState<number>(0);
+  const [preorderCount, _] = useState<number>(0);
   const [sent, setSent] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
 
