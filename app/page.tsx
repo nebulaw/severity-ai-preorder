@@ -29,26 +29,37 @@ const formValuesSchema = z.object({
 
 export default function Home() {
   const [preorderCount, setPreorderCount] = useState<number>(0);
+  const [sent, setSent] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
 
-  async function addPreorder(formData: FormData) {
-    const formValues = {} as Record<string, string | object>;
-    for (const [key, value] of [...formData.entries()]) {
-      if (key.includes("ACTION_ID")) continue;
-      formValues[key] = value.valueOf();
+  const handleSubmit = () => {
+    if (sent) {
+      setMessage("თქვენი ელ. ფოსტა უკვე დარეგისტრირებულია!");
+    } else {
+      setMessage("თქვენ წარმატებით დარეგისტრირდით!");
+      setSent(true);
     }
-
-    const parsed = await formValuesSchema.parseAsync(formValues);
-
-    const graphQLClient = new GraphQLClient(`https://severity-ai-xi.vercel.app/api/graphql`);
-    await graphQLClient.request(preorderMutation, parsed);
   }
 
-  async function getPreorderCount() {
-    const data = await request<QueryData>(`https://severity-ai-xi.vercel.app/api/graphql`, countQuery);
-    return data.getPreorderCount;
-  }
-
-  getPreorderCount().then((count) => preorderCount !== count && setPreorderCount(count));
+  // async function addPreorder(formData: FormData) {
+  //   const formValues = {} as Record<string, string | object>;
+  //   for (const [key, value] of [...formData.entries()]) {
+  //     if (key.includes("ACTION_ID")) continue;
+  //     formValues[key] = value.valueOf();
+  //   }
+  //
+  //   const parsed = await formValuesSchema.parseAsync(formValues);
+  //
+  //   const graphQLClient = new GraphQLClient(`https://severity-ai-xi.vercel.app/api/graphql`);
+  //   await graphQLClient.request(preorderMutation, parsed);
+  // }
+  //
+  // async function getPreorderCount() {
+  //   const data = await request<QueryData>(`https://severity-ai-xi.vercel.app/api/graphql`, countQuery);
+  //   return data.getPreorderCount;
+  // }
+  //
+  // getPreorderCount().then((count) => preorderCount !== count && setPreorderCount(count));
 
   return (
     <div className="min-h-screen flex flex-col p-4 sm:p-8 pb-20 gap-4 sm:gap-16 text-white bg-[url(/bg-pattern.png)] bg-cover bg-no-repeat bg-center">
@@ -84,7 +95,7 @@ export default function Home() {
               <span className="">{preorderCount}</span> ადამიანი ელოდება ჩვენს პროდუქტს
             </div>
           )}
-          <form action={addPreorder} className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md mx-auto">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md mx-auto">
             <input
               type="email"
               name="email"
@@ -92,10 +103,13 @@ export default function Home() {
               className="input input-bordered w-full sm:w-auto rounded-lg p-2 bg-[#373737] border-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 px-4"
               required
             />
-            <button className="btn btn-block bg-[#f1f1f1] hover:bg-white text-black border-none rounded-lg py-2 px-4 transition-colors w-full sm:w-auto mt-2 sm:mt-0" type="submit"> {/* Added w-full sm:w-auto and mt-2 sm:mt-0 */}
+            <button onClick={handleSubmit} className="btn btn-block bg-[#f1f1f1] hover:bg-white text-black border-none rounded-lg py-2 px-4 transition-colors w-full sm:w-auto mt-2 sm:mt-0">
               გაგზავნა
             </button>
-          </form>
+          </div>
+          <div className="text-gray-100 text-sm font-bold mt-4 sm:mt-6 text-center">
+            {message}
+          </div>
         </div>
       </main>
     </div>
