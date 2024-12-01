@@ -1,101 +1,110 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { GraphQLClient, gql, request } from "graphql-request";
+import { z } from "zod";
+import "./env-config";
+const countQuery = gql`
+  query getPreorderCount {
+    getPreorderCount
+  }
+`;
+
+const preorderMutation = gql`
+  mutation addPreorder($email: String!) {
+    addPreorder(email: $email) {
+      id
+    }
+  }
+`;
+
+interface QueryData {
+  getPreorderCount: number;
+}
+
+const formValuesSchema = z.object({
+  email: z.string().email(),
+})
+
+
+const host = process.env.NEXT_PUBLIC_HOST_URL;
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [preorderCount, setPreorderCount] = useState<number>(0);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  async function addPreorder(formData: FormData) {
+
+    console.log("Adding preorder to ", host);
+    const formValues = {} as Record<string, string | object>;
+    for (const [key, value] of [...formData.entries()]) {
+      if (key.includes("ACTION_ID")) continue;
+      formValues[key] = value.valueOf();
+    }
+
+    // Validate the parsed form data
+    const parsed = await formValuesSchema.parseAsync(formValues);
+
+    // Create a GraphQL client and execute the mutation
+    const graphQLClient = new GraphQLClient(`${host}/api/graphql`);
+    await graphQLClient.request(preorderMutation, parsed);
+  }
+
+  async function getPreorderCount() {
+    const data = await request<QueryData>(`${host}/api/graphql`, countQuery);
+    return data.getPreorderCount;
+  }
+
+  getPreorderCount().then((count) => preorderCount !== count && setPreorderCount(count));
+
+  return (
+    <div className="min-h-screen flex flex-col p-4 sm:p-8 pb-20 gap-4 sm:gap-16 text-white bg-[url(/bg-pattern.png)] bg-cover bg-no-repeat bg-center">
+
+
+      <nav className="flex flex-col-reverse sm:flex-row items-center justify-center w-full p-4 sm:p-6 rounded-xl z-40">
+        <a className="text-gray-300 w-full text-center sm:w-1/3 hover:text-white transition-colors hover:cursor-pointer text-base sm:text-lg sm:flex justify-start" href="mailto:severityai@gmail.com">
+          severityai@gmail.com
+        </a>
+        <div className="text-gray-100 w-full sm:w-1/3 flex justify-center font-bold text-2xl sm:text-3xl text-center">
+          Severity AI
+        </div>
+       <div className="text-gray-100 w-full sm:w-1/3 font-bold text-xl sm:text-2xl text-center hidden sm:flex justify-end">
+          <button className="text-white bg-white bg-opacity-10 hover:bg-opacity-20 font-medium border border-gray-500 py-2 px-4 rounded-lg transition-colors">
+            დაიწყე
+          </button>
+        </div>
+      </nav>
+
+      <main className="flex flex-col gap-4 sm:gap-8 items-center justify-center h-full">
+        <div className="font-bold text-gray-100 mb-4 sm:mb-10 border border-gray-500 py-2 px-4 rounded-xl bg-black bg-opacity-20 text-center">
+          AI-Powered Application Security Tool
+        </div>
+        <div className="text-4xl sm:text-6xl font-bold text-gray-300 max-w-[800px] text-center px-4 sm:px-8 sm:leading-snug">
+          დაიცავი შენი ბიზნესი კიბერ შეტევებისგან
+        </div>
+        <div className="font-extralight text-gray-400 max-w-[700px] text-center text-sm sm:text-base mb-8 sm:mb-16 px-4">
+          ჩვენ უახლესი ხელოვნური ინტელექტის გამოყენებით ვადგენთ და ვასწორებთ უსაფრთხოების დარღვევებს რათა დავიცვათ თქვენი აპლიკაცია. {/*ხარვეზების დროული პრევენცია თქვენს კარგ რეპუტაციას, დაზოგილ ხარჯებსა და ნდობას ნიშნავს.*/}
+        </div>
+        <div>
+          {preorderCount > 0 && (
+            <div className="text-gray-100 text-sm font-bold mb-4 sm:mb-6 text-center shadow drop-shadow-lg">
+              <span className="">{preorderCount}</span> ადამიანი ელოდება ჩვენს პროდუქტს
+            </div>
+          )}
+          <form action={addPreorder} className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md mx-auto"> {/* Added max-w-md and mx-auto */}
+            <input
+              type="email"
+              name="email"
+              placeholder="შეიყვანე შენი მეილი..."
+              className="input input-bordered w-full sm:w-auto rounded-lg p-2 bg-[#373737] border-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 px-4"
+              required
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <button className="btn btn-block bg-[#f1f1f1] hover:bg-white text-black border-none rounded-lg py-2 px-4 transition-colors w-full sm:w-auto mt-2 sm:mt-0" type="submit"> {/* Added w-full sm:w-auto and mt-2 sm:mt-0 */}
+              გაგზავნა
+            </button>
+          </form>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
+
