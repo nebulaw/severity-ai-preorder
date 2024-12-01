@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "rm -fr ./db/migrations; rm -f sqlite.db; npm run migrate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "migrate": "drizzle-kit generate --dialect sqlite --out ./db/migrations --schema ./db/schema.ts"
+    "migrate": "drizzle-kit generate --dialect sqlite --out ./db/migrations --schema ./db/schema.ts",
+    "clean": "rm -fr .next db/migrations sqlite.db"
   },
   "dependencies": {
     "better-sqlite3": "^11.6.0",
