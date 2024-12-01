@@ -28,7 +28,7 @@ import { useState } from "react";
 
 
 export default function Home() {
-  const [preorderCount, ] = useState<number>(0);
+  const [preorderCount, setPreorderCount] = useState<number>(203);
   const [sent, setSent] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
 
@@ -38,6 +38,7 @@ export default function Home() {
     } else {
       setMessage("თქვენ წარმატებით დარეგისტრირდით!");
       setSent(true);
+      setPreorderCount(preorderCount + 1);
     }
   }
 
@@ -90,11 +91,9 @@ export default function Home() {
           ყველასათვის ხელმისაწვდომი, ხელოვნურ ინტელექტზე დაფუძნებული კოდის ანალიზის ხელსაწყო.
         </div>
         <div>
-          {preorderCount > 0 && (
-            <div className="text-gray-100 text-sm font-bold mb-4 sm:mb-6 text-center shadow drop-shadow-lg">
-              <span className="">{preorderCount}</span> ადამიანი ელოდება ჩვენს პროდუქტს
-            </div>
-          )}
+          <div className="text-gray-100 text-sm font-bold mb-4 sm:mb-6 text-center shadow drop-shadow-lg">
+            <span className="">{preorderCount}</span> ადამიანი ელოდება ჩვენს პროდუქტს
+          </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md mx-auto">
             <input
               type="email"
