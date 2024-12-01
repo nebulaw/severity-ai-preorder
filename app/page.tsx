@@ -28,7 +28,7 @@ import { useState } from "react";
 
 
 export default function Home() {
-  const [preorderCount, _] = useState<number>(0);
+  const [preorderCount, ] = useState<number>(0);
   const [sent, setSent] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
 
